@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Registration Form</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f2f2f2;
+            text-align: center;
+        }
+
+        form {
+            background: white;
+            padding: 20px;
+            width: 300px;
+            margin: 50px auto;
+            border-radius: 10px;
+            box-shadow: 0 0 10px gray;
+        }
+
+        input, select {
+            width: 90%;
+            padding: 8px;
+            margin: 8px 0;
+        }
+
+        button {
+            padding: 10px;
+            width: 100%;
+            background: green;
+            color: white;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Registration Form</h2>
+
+<form>
+    <input type="text" placeholder="Enter Name" required>
+    <input type="email" placeholder="Enter Email" required>
+
+    <!-- State Dropdown -->
+    <select id="state" required>
+        <option value="">Select State</option>
+    </select>
+
+    <!-- City Dropdown -->
+    <select id="city" required>
+        <option value="">Select City</option>
+    </select>
+
+    <button type="submit">Submit</button>
+</form>
+
+<script>
+let allData = [];
+
+async function loadData() {
+    const res = await fetch("https://raw.githubusercontent.com/nshntarora/Indian-Cities-JSON/master/cities.json");
+    allData = await res.json();
+
+    const stateSelect = document.getElementById("state");
+
+    const states = [...new Set(allData.map(item => item.state))];
+
+    states.sort().forEach(state => {
+        const option = document.createElement("option");
+        option.value = state;
+        option.textContent = state;
+        stateSelect.appendChild(option);
+    });
+}
+
+document.getElementById("state").addEventListener("change", function () {
+    const selectedState = this.value;
+    const citySelect = document.getElementById("city");
+
+    citySelect.innerHTML = "<option value=''>Select City</option>";
+
+    const filteredCities = allData.filter(item => item.state === selectedState);
+
+    filteredCities.forEach(city => {
+        const option = document.createElement("option");
+        option.value = city.name;
+        option.textContent = city.name;
+        citySelect.appendChild(option);
+    });
+});
+
+loadData();
+</script>
+
+</body>
+</html>

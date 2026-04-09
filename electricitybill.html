@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Electricity Bill Calculator</title>
+</head>
+<body>
+    <h2>Electricity Bill Calculator</h2>
+    
+    <form action="electricitybill.php" method="POST">
+        <p>CNO: <input type="text" name="cno" required></p>
+        <p>Name: <input type="text" name="cname" required></p>
+        <p>Current Reading: <input type="number" name="cread" step="0.01" min="0" required></p>
+        <p>Previous Reading: <input type="number" name="pread" step="0.01" min="0" required></p>
+        <p><input type="submit" name="calculate" value="Calculate Bill"></p>
+    </form>
