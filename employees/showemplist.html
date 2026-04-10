@@ -59,7 +59,8 @@
 async function loadEmployees() {
     try {
         // Fetch data from PHP API
-        const response = await fetch("../api/getemplist.php");
+        // const response = await fetch("../api/getemplist.php");
+        const response = await fetch("http://localhost/leapStart/api/getemplist.php");
         const data = await response.json();
 
         const tableBody = document.querySelector("#empTable tbody");
