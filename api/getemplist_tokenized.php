@@ -5,6 +5,7 @@ $dbname = "practice";
 $user = "postgres";
 $password = "@2333103080@";
 
+
 if(isset($_GET["token"])){
 
  try {
