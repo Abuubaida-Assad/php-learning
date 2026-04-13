@@ -19,6 +19,7 @@ if(isset($_GET["token"])){
     $qry = "select count(*) as cnt from tokens where tokens='$tn'";
     $stmt = $pdo->query($qry);
     $x = $stmt->fetch(PDO::FETCH_ASSOC);
+    
 
     if($x['cnt'] == 1){
 
