@@ -7,7 +7,6 @@ $password = "@2333103080@";
 
 
 if(isset($_GET["token"])){
-
  try {
     $tn = $_GET["token"];
 
