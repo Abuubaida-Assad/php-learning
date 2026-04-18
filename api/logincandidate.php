@@ -1,51 +1,66 @@
 <?php
-header("Content-Type: application/json");
 
-$host = "localhost";
-$port = "5432";
-$dbname = "Leapstart";
-$user = "postgres";
-$password = "@2333103080@";
+header('Content-Type: application/json');
+
+// 1. Check request method
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    echo json_encode([
+        "status" => "error",
+        "message" => "Only POST method allowed"
+    ]);
+    exit;
+}
+
+
+// 2. Handle inputs
+$idno = $_POST['idno'] ?? '';
+$password = $_POST['password'] ?? '';
+
+if (empty($idno) || empty($password)) {
+    echo json_encode([
+        "status" => "error",
+        "message" => "ID and Password required"
+    ]);
+    exit;
+}
+
+// 3. Connect to DB
+$host = 'localhost';
+$db = 'Leapstart';
+$user = 'postgres';
+$dbPassword = '@2333103080@';
 
 try {
-    $dsn = "pgsql:host=$host;port=$port;dbname=$dbname;";
-    $pdo = new PDO($dsn, $user, $password);
+    $dsn = "pgsql:host=$host;port=5432;dbname=$db";
+    $pdo = new PDO($dsn, $user, $dbPassword);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Get POST data
-    $idno = $_POST['idno'];
-    $password_input = $_POST['password'];
+    // 4. Check if record exists
+    $stmt = $pdo->prepare("
+        SELECT * FROM candidates 
+        WHERE idno = :idno AND password = :password
+    ");
 
-    // Check user
-    $sql = "SELECT * FROM candidates WHERE idno = :idno AND isActive = TRUE";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([':idno' => $idno]);
-
+    $stmt->execute([
+        ':idno' => $idno,
+        ':password' => $password
+    ]);
+        
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($user && password_verify($password_input, $user['password'])) {
-
-        // Generate secure token (50 chars)
-        $token = bin2hex(random_bytes(25)); // 25 bytes = 50 hex chars
-
-        // Insert token
-        $insertToken = "INSERT INTO userTokens (idno, token)
-                        VALUES (:idno, :token)";
-        $stmt2 = $pdo->prepare($insertToken);
-        $stmt2->execute([
-            ':idno' => $idno,
-            ':token' => $token
-        ]);
-
+    if ($user) {
         echo json_encode([
             "status" => "success",
             "message" => "Login successful",
-            "token" => $token
+            "data" => [
+                "idno" => $user['idno'],
+                "name" => $user['name'],
+                "email" => $user['email']
+            ]
         ]);
-
     } else {
         echo json_encode([
-            "status" => "error",
+            "status" => "failed",
             "message" => "Invalid ID or Password"
         ]);
     }
