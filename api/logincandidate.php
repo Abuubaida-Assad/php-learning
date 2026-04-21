@@ -37,8 +37,10 @@ try {
 
     // 4. Check if record exists
     $stmt = $pdo->prepare("
-        SELECT * FROM candidates 
-        WHERE idno = :idno AND password = :password
+          SELECT * FROM candidates 
+    WHERE idno = :idno 
+    AND password = :password 
+    AND isactive = true;
     ");
 
     $stmt->execute([
