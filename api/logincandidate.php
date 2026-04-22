@@ -1,5 +1,7 @@
 <?php
 
+include("functions.php");
+
 header('Content-Type: application/json');
 
 // 1. Check request method
@@ -40,7 +42,6 @@ try {
           SELECT * FROM candidates 
     WHERE idno = :idno 
     AND password = :password 
-    AND isactive = true;
     ");
 
     $stmt->execute([
@@ -51,18 +52,39 @@ try {
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($user) {
-        echo json_encode([
-            "status" => "success",
-            "message" => "Login successful",
-            "data" => [
+        if ($user['isactive']==true)
+            {
+                $token = getAccessToken(50);
+                $qry = "delete from userTokens where idno=:idno";
+                $stmt = $pdo->prepare($qry);
+                $stmt->execute([':idno' => $idno]);
+
+                $qry = "insert into userTokens (idno,token) values (:idno,:token)"; 
+                $stmt = $pdo->prepare($qry);
+                $stmt->execute([':idno' => $idno,':token'=>$token]);
+
+                 echo json_encode([
+                "status" => "success",
+                "message" => "Login successful",
+                 "data" => [
                 "idno" => $user['idno'],
                 "name" => $user['name'],
-                "email" => $user['email']
+                "email" => $user['email'],
+                "token" => $token
+
             ]
         ]);
+            }else {
+                 echo json_encode([
+                 "status" => "success",
+                 "message" => "Account is inactive."
+            ]
+        );
+            }
+       
     } else {
         echo json_encode([
-            "status" => "failed",
+            "status" => "Succsess",
             "message" => "Invalid ID or Password"
         ]);
     }
